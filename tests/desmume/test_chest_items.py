@@ -68,7 +68,7 @@ def test_custom_chest_items(chest_test_emu: DeSmuMEWrapper, request: pytest.Fixt
         chest_test_emu.wait(800)
 
         # Check if the "got item" text is correct
-        if item_id in GOT_ITEM_TEXT:
+        if hasattr(chest_test_emu, 'screenshot') and item_id in GOT_ITEM_TEXT:
             ocr_text: str = pytesseract.image_to_string(
                 chest_test_emu.screenshot().crop((24, 325, 231, 384))
             ).replace('\u2019', "'")

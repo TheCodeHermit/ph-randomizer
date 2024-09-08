@@ -28,6 +28,7 @@ test = [
 ]
 desmume = [
     "py-desmume==0.0.6",
+    "birds-eye-lib@git+https://github.com/mike8699/birds-eye.git@nds-joypad",
 ]
 types = [
     "mypy==1.8.0",
