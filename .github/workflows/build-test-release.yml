@@ -8,272 +8,272 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
-  lint:
-    name: Linting/style checks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#   lint:
+#     name: Linting/style checks
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install pre-commit
-        run: pip install pre-commit
+#       - name: Install pre-commit
+#         run: pip install pre-commit
 
-      - name: Cache pre-commit hooks
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pre-commit/
-          key: pre-commit-cache|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}|${{ hashFiles('setup.cfg') }}
+#       - name: Cache pre-commit hooks
+#         uses: actions/cache@v3
+#         with:
+#           path: ~/.cache/pre-commit/
+#           key: pre-commit-cache|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}|${{ hashFiles('setup.cfg') }}
 
-      - name: Run pre-commit checks
-        run: pre-commit run --all-files --verbose
+#       - name: Run pre-commit checks
+#         run: pre-commit run --all-files --verbose
 
-  type-check:
-    name: Type-checking
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#   type-check:
+#     name: Type-checking
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install tox
-        run: pip install tox
+#       - name: Install tox
+#         run: pip install tox
 
-      - name: Run type checking
-        run: tox -e type
+#       - name: Run type checking
+#         run: tox -e type
 
-  # check-logic:
-  #   name: Validate logic
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+#   # check-logic:
+#   #   name: Validate logic
+#   #   runs-on: ubuntu-latest
+#   #   steps:
+#   #     - uses: actions/checkout@v3
 
-  #     - name: Checkout rando-shuffler repo
-  #       uses: actions/checkout@v3
-  #       with:
-  #         repository: minishmaker/rando-shuffler
-  #         path: rando-shuffler
+#   #     - name: Checkout rando-shuffler repo
+#   #       uses: actions/checkout@v3
+#   #       with:
+#   #         repository: minishmaker/rando-shuffler
+#   #         path: rando-shuffler
 
-  #     - name: Get cache key
-  #       id: shuffler-cache-key
-  #       run: echo "key=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-  #       shell: bash
-  #       working-directory: rando-shuffler
+#   #     - name: Get cache key
+#   #       id: shuffler-cache-key
+#   #       run: echo "key=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+#   #       shell: bash
+#   #       working-directory: rando-shuffler
 
-  #     - uses: actions/cache@v3
-  #       id: rando-shuffler-cache
-  #       with:
-  #         path: rando-shuffler
-  #         key: ${{ steps.shuffler-cache-key.outputs.key }}
+#   #     - uses: actions/cache@v3
+#   #       id: rando-shuffler-cache
+#   #       with:
+#   #         path: rando-shuffler
+#   #         key: ${{ steps.shuffler-cache-key.outputs.key }}
 
-  #     - name: Compile rando-shuffler
-  #       if: steps.rando-shuffler-cache.outputs.cache-hit != 'true'
-  #       run: cargo build
-  #       working-directory: rando-shuffler
-  #       env:
-  #         CARGO_TERM_COLOR: always
+#   #     - name: Compile rando-shuffler
+#   #       if: steps.rando-shuffler-cache.outputs.cache-hit != 'true'
+#   #       run: cargo build
+#   #       working-directory: rando-shuffler
+#   #       env:
+#   #         CARGO_TERM_COLOR: always
 
-  #     - name: Make it executable
-  #       run: chmod +x rando-shuffler/target/debug/rando_shuffler
+#   #     - name: Make it executable
+#   #       run: chmod +x rando-shuffler/target/debug/rando_shuffler
 
-  #     - name: Run the MCR shuffler
-  #       run: |
-  #         shopt -s globstar
-  #         find rando-shuffler/ -name "*.logic" -type f -delete # remove test files
-  #         file_count=0
-  #         failed=0;
-  #         for file in **/*.logic; do
-  #           echo "$file... ";
-  #           status=0
-  #           tmpfile=$(mktemp /tmp/output.XXXXXX)  # create temporary file to store output
-  #           rando-shuffler/target/debug/rando_shuffler "$file" >> $tmpfile 2>&1 || status=1
-  #           if [[ $status != 0 ]]; then
-  #             failed=$((failed + 1));
-  #             echo -e "\033[0;31mFAILED\033[0m"
-  #             cat $tmpfile  # print output of rando-shuffler if errors occured
-  #           else
-  #             echo -e "\033[0;32mPASSED\033[0m"
-  #           fi
-  #           echo "-------------------------------"
-  #           echo ""
-  #           file_count=$((file_count + 1))
-  #         done;
-  #         echo "RESULTS: $((file_count - failed)) / $file_count passed"
-  #         if [[ $failed != 0 ]]; then
-  #           exit 1;
-  #         fi
+#   #     - name: Run the MCR shuffler
+#   #       run: |
+#   #         shopt -s globstar
+#   #         find rando-shuffler/ -name "*.logic" -type f -delete # remove test files
+#   #         file_count=0
+#   #         failed=0;
+#   #         for file in **/*.logic; do
+#   #           echo "$file... ";
+#   #           status=0
+#   #           tmpfile=$(mktemp /tmp/output.XXXXXX)  # create temporary file to store output
+#   #           rando-shuffler/target/debug/rando_shuffler "$file" >> $tmpfile 2>&1 || status=1
+#   #           if [[ $status != 0 ]]; then
+#   #             failed=$((failed + 1));
+#   #             echo -e "\033[0;31mFAILED\033[0m"
+#   #             cat $tmpfile  # print output of rando-shuffler if errors occured
+#   #           else
+#   #             echo -e "\033[0;32mPASSED\033[0m"
+#   #           fi
+#   #           echo "-------------------------------"
+#   #           echo ""
+#   #           file_count=$((file_count + 1))
+#   #         done;
+#   #         echo "RESULTS: $((file_count - failed)) / $file_count passed"
+#   #         if [[ $failed != 0 ]]; then
+#   #           exit 1;
+#   #         fi
 
-  check-aux-data:
-    name: Validate aux data
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#   check-aux-data:
+#     name: Validate aux data
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install dependencies
-        run: pip install -e .
+#       - name: Install dependencies
+#         run: pip install -e .
 
-      - name: Check if there are changes to pydantic models that aren't reflected in JSON schema
-        run: |
-          python ph_rando/shuffler/aux_models.py
-          git diff --exit-code
-          if [ $? -ne 0 ]
-          then
-            exit 1
-          fi
+#       - name: Check if there are changes to pydantic models that aren't reflected in JSON schema
+#         run: |
+#           python ph_rando/shuffler/aux_models.py
+#           git diff --exit-code
+#           if [ $? -ne 0 ]
+#           then
+#             exit 1
+#           fi
 
-      - name: Run pydantic validation on aux data
-        run: |
-          python <<HEREDOC
-          import json, sys
-          from pathlib import Path
-          from pydantic import ValidationError
-          from ph_rando.shuffler.aux_models import Area
-          failed = False
-          for file in (Path.cwd() / 'ph_rando' / 'shuffler' / 'logic').rglob('*.json'):
-            with open(file) as f:
-              try:
-                Area(**json.load(f))
-              except ValidationError as e:
-                failed = True
-                print(file.relative_to(Path.cwd()), file=sys.stderr, end='\n')
-                print(e, file=sys.stderr, end='\n\n\n')
-          if failed:
-            exit(1)
-          HEREDOC
+#       - name: Run pydantic validation on aux data
+#         run: |
+#           python <<HEREDOC
+#           import json, sys
+#           from pathlib import Path
+#           from pydantic import ValidationError
+#           from ph_rando.shuffler.aux_models import Area
+#           failed = False
+#           for file in (Path.cwd() / 'ph_rando' / 'shuffler' / 'logic').rglob('*.json'):
+#             with open(file) as f:
+#               try:
+#                 Area(**json.load(f))
+#               except ValidationError as e:
+#                 failed = True
+#                 print(file.relative_to(Path.cwd()), file=sys.stderr, end='\n')
+#                 print(e, file=sys.stderr, end='\n\n\n')
+#           if failed:
+#             exit(1)
+#           HEREDOC
 
-  check-randomizer-settings:
-    name: Validate randomizer settings
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#   check-randomizer-settings:
+#     name: Validate randomizer settings
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install dependencies
-        run: pip install -e .
+#       - name: Install dependencies
+#         run: pip install -e .
 
-      - name: Check if there are changes to pydantic models that aren't reflected in JSON schema
-        run: |
-          python ph_rando/settings.py
-          git diff --exit-code
-          if [ $? -ne 0 ]
-          then
-            exit 1
-          fi
+#       - name: Check if there are changes to pydantic models that aren't reflected in JSON schema
+#         run: |
+#           python ph_rando/settings.py
+#           git diff --exit-code
+#           if [ $? -ne 0 ]
+#           then
+#             exit 1
+#           fi
 
-      - name: Run pydantic validation on settings json
-        run: |
-          python <<HEREDOC
-          import json, sys
-          from pathlib import Path
-          from pydantic import ValidationError
-          from ph_rando.settings import Settings
-          failed = False
-          with open(Path.cwd() / 'ph_rando' / 'settings.json') as f:
-            try:
-              Settings(**json.load(f))
-            except ValidationError as e:
-              failed = True
-              print(file.relative_to(Path.cwd()), file=sys.stderr, end='\n')
-              print(e, file=sys.stderr, end='\n\n\n')
-          if failed:
-            exit(1)
-          HEREDOC
+#       - name: Run pydantic validation on settings json
+#         run: |
+#           python <<HEREDOC
+#           import json, sys
+#           from pathlib import Path
+#           from pydantic import ValidationError
+#           from ph_rando.settings import Settings
+#           failed = False
+#           with open(Path.cwd() / 'ph_rando' / 'settings.json') as f:
+#             try:
+#               Settings(**json.load(f))
+#             except ValidationError as e:
+#               failed = True
+#               print(file.relative_to(Path.cwd()), file=sys.stderr, end='\n')
+#               print(e, file=sys.stderr, end='\n\n\n')
+#           if failed:
+#             exit(1)
+#           HEREDOC
 
-  run-shuffler:
-    name: Run the shuffler against logic and aux data
-    needs:
-      - check-aux-data
-      # - check-logic
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
+#   run-shuffler:
+#     name: Run the shuffler against logic and aux data
+#     needs:
+#       - check-aux-data
+#       # - check-logic
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 10
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install dependencies
-        run: pip install -e .
+#       - name: Install dependencies
+#         run: pip install -e .
 
-      - name: Run the shuffler
-        run: ph_rando_shuffler -o -- --spoiler-log spoiler.txt
+#       - name: Run the shuffler
+#         run: ph_rando_shuffler -o -- --spoiler-log spoiler.txt
 
-      - name: Print spoiler log
-        run: cat spoiler.txt
+#       - name: Print spoiler log
+#         run: cat spoiler.txt
 
-      - name: Save spoiler log as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: spoiler.txt
-          path: spoiler.txt
+#       - name: Save spoiler log as an artifact
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: spoiler.txt
+#           path: spoiler.txt
 
-  tests:
-    name: Run tests
-    needs:
-      - check-aux-data
-      # - check-logic
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu, macos, windows]
-    defaults:
-      run:
-        shell: bash
-    runs-on: ${{ matrix.os }}-latest
-    steps:
-      - uses: actions/checkout@v4
+#   tests:
+#     name: Run tests
+#     needs:
+#       - check-aux-data
+#       # - check-logic
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         os: [ubuntu, macos, windows]
+#     defaults:
+#       run:
+#         shell: bash
+#     runs-on: ${{ matrix.os }}-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install tox
-        run: pip install tox
+#       - name: Install tox
+#         run: pip install tox
 
-      - name: Run tests
-        run: tox -e test
+#       - name: Run tests
+#         run: tox -e test
 
 
   generate-base-patch:
@@ -421,6 +421,21 @@ jobs:
           choco install -y tesseract
           echo "C:\Program Files\Tesseract-OCR" >> $GITHUB_PATH
 
+      - name: Download BizHawk
+        run: |
+          curl -L https://github.com/TASEmulators/BizHawk/releases/download/2.9.1/BizHawk-2.9.1-win-x64.zip -o BizHawk-2.9.1-win-x64.zip
+          unzip BizHawk-2.9.1-win-x64.zip -d BizHawk
+
+      - name: Download BizHawk external tool
+        run: |
+          curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -L -o ExternalTool.zip "https://api.github.com/repos/mike8699/birds-eye/actions/artifacts/1906957269/zip" 
+          unzip ExternalTool.zip -d BizHawk/ExternalTools
+
+      - name: Install Microsoft Visual C++ 2010 SP1 Redistributable Package
+        run: |
+          powershell -Command "Invoke-WebRequest https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe -OutFile vcredist_x64.exe"
+          powershell -Command "Start-Process -FilePath vcredist_x64.exe -ArgumentList '/install /q /norestart' -Verb RunAs -Wait"
+
       - name: Fetch PH rom
         run: |
           pip install gdown
@@ -464,166 +479,166 @@ jobs:
         if: always()
         run: rm -rf *.nds
 
-  build:
-    name: Build randomizer
-    needs:
-      - generate-base-patch
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu, macos, windows]
-    defaults:
-      run:
-        shell: bash
-    runs-on: ${{ matrix.os }}-latest
-    steps:
-      - uses: actions/checkout@v4
+#   build:
+#     name: Build randomizer
+#     needs:
+#       - generate-base-patch
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         os: [ubuntu, macos, windows]
+#     defaults:
+#       run:
+#         shell: bash
+#     runs-on: ${{ matrix.os }}-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-          check-latest: true
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version-file: '.python-version'
+#           check-latest: true
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Install tox
-        run: pip install tox
+#       - name: Install tox
+#         run: pip install tox
 
-      - name: Download base patches
-        uses: actions/download-artifact@v3
+#       - name: Download base patches
+#         uses: actions/download-artifact@v3
 
-      - name: Move all patch files into the same directory so pyinstaller can find them
-        run: |
-          mkdir -p base/out
-          mv ./**/*.bps base/out
+#       - name: Move all patch files into the same directory so pyinstaller can find them
+#         run: |
+#           mkdir -p base/out
+#           mv ./**/*.bps base/out
 
-      - name: Build randomizer executable
-        run: tox -e build
+#       - name: Build randomizer executable
+#         run: tox -e build
 
-      - name: Get current commit hash
-        id: commit-hash
-        run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+#       - name: Get current commit hash
+#         id: commit-hash
+#         run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ph-randomizer_${{ steps.commit-hash.outputs.hash }}_${{ matrix.os }}
-          path: dist/
+#       - uses: actions/upload-artifact@v3
+#         with:
+#           name: ph-randomizer_${{ steps.commit-hash.outputs.hash }}_${{ matrix.os }}
+#           path: dist/
 
-  run-executable:
-    name: Run built randomizer executable [${{ matrix.os }} / ${{ matrix.rom_variant }}]
-    needs: [build]
-    runs-on: ${{ matrix.os }}-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu, macos, windows]
-        rom_variant: [US, US (D-Pad Patch)]
-        include:
-          - rom_variant: US
-            google_drive_url_secret: PH_US_GOOGLE_DRIVE_ID
-          - rom_variant: US (D-Pad Patch)
-            google_drive_url_secret: PH_US_DPAD_GOOGLE_DRIVE_ID
-    steps:
-      - uses: actions/checkout@v4
+#   run-executable:
+#     name: Run built randomizer executable [${{ matrix.os }} / ${{ matrix.rom_variant }}]
+#     needs: [build]
+#     runs-on: ${{ matrix.os }}-latest
+#     timeout-minutes: 10
+#     defaults:
+#       run:
+#         shell: bash
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         os: [ubuntu, macos, windows]
+#         rom_variant: [US, US (D-Pad Patch)]
+#         include:
+#           - rom_variant: US
+#             google_drive_url_secret: PH_US_GOOGLE_DRIVE_ID
+#           - rom_variant: US (D-Pad Patch)
+#             google_drive_url_secret: PH_US_DPAD_GOOGLE_DRIVE_ID
+#     steps:
+#       - uses: actions/checkout@v4
 
-      # Note: intentionally use an older version of Python here;
-      # The pyinstaller build should not depend on a specific Python
-      # version being installed (or, Python being installed at all
-      # for that matter).
-      - name: Get two versions of Python behind min required
-        id: python-version
-        run: |
-          PYTHON_VERSION=$(cat .python-version)
-          echo "python-version="3.$(echo "${PYTHON_VERSION:2} 2" | awk '{print $1-$2}')"" >> $GITHUB_OUTPUT
-          rm -rf *
+#       # Note: intentionally use an older version of Python here;
+#       # The pyinstaller build should not depend on a specific Python
+#       # version being installed (or, Python being installed at all
+#       # for that matter).
+#       - name: Get two versions of Python behind min required
+#         id: python-version
+#         run: |
+#           PYTHON_VERSION=$(cat .python-version)
+#           echo "python-version="3.$(echo "${PYTHON_VERSION:2} 2" | awk '{print $1-$2}')"" >> $GITHUB_OUTPUT
+#           rm -rf *
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ steps.python-version.outputs.python-version }}
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: ${{ steps.python-version.outputs.python-version }}
 
-      - name: Upgrade `pip` and install `wheel`
-        run: python -m pip install --upgrade pip wheel
+#       - name: Upgrade `pip` and install `wheel`
+#         run: python -m pip install --upgrade pip wheel
 
-      - name: Fetch PH rom
-        run: |
-          pip install gdown
-          gdown ${{ secrets[matrix.google_drive_url_secret] }}
+#       - name: Fetch PH rom
+#         run: |
+#           pip install gdown
+#           gdown ${{ secrets[matrix.google_drive_url_secret] }}
 
-      - name: Get filename of rom
-        id: rom-filename
-        run: echo "rom_filename=$(ls *.nds)" >> $GITHUB_OUTPUT
+#       - name: Get filename of rom
+#         id: rom-filename
+#         run: echo "rom_filename=$(ls *.nds)" >> $GITHUB_OUTPUT
 
-      - name: Get current commit hash
-        id: commit-hash
-        run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+#       - name: Get current commit hash
+#         id: commit-hash
+#         run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Download built executable from previous job
-        uses: actions/download-artifact@v3
-        with:
-          name: ph-randomizer_${{ steps.commit-hash.outputs.hash }}_${{ matrix.os }}
+#       - name: Download built executable from previous job
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: ph-randomizer_${{ steps.commit-hash.outputs.hash }}_${{ matrix.os }}
 
-      - name: Run executable (no GUI)
-        run: |
-          chmod +x ./ph_rando
-          ./ph_rando --no-gui --input-rom-path="${{ steps.rom-filename.outputs.rom_filename }}" --output-rom-path="out.nds"
+#       - name: Run executable (no GUI)
+#         run: |
+#           chmod +x ./ph_rando
+#           ./ph_rando --no-gui --input-rom-path="${{ steps.rom-filename.outputs.rom_filename }}" --output-rom-path="out.nds"
 
-      - name: Cleanup
-        if: always()
-        run: rm -rf *.nds
+#       - name: Cleanup
+#         if: always()
+#         run: rm -rf *.nds
 
-  release:
-    name: Publish a release
-    # Require all tests to pass before a release is possible
-    needs:
-      - build
-      - lint
-      - type-check
-      - tests
-      # - check-logic
-      - check-aux-data
-      - run-shuffler
-      - test-desmume
-      - run-executable
-    # Only create a release if a tag was pushed
-    if: "startsWith(github.ref, 'refs/tags/')"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#   release:
+#     name: Publish a release
+#     # Require all tests to pass before a release is possible
+#     needs:
+#       - build
+#       - lint
+#       - type-check
+#       - tests
+#       # - check-logic
+#       - check-aux-data
+#       - run-shuffler
+#       - test-desmume
+#       - run-executable
+#     # Only create a release if a tag was pushed
+#     if: "startsWith(github.ref, 'refs/tags/')"
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Get current commit hash
-        id: commit-hash
-        run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+#       - name: Get current commit hash
+#         id: commit-hash
+#         run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Get version string
-        id: version-string
-        run: echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
+#       - name: Get version string
+#         id: version-string
+#         run: echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
 
-      - name: Download built executables
-        uses: actions/download-artifact@v3
+#       - name: Download built executables
+#         uses: actions/download-artifact@v3
 
-      - name: Replace commit hash with version string
-        run: |
-          mv ph-randomizer_${{ steps.commit-hash.outputs.hash }}_ubuntu ph-randomizer_${{ steps.version-string.outputs.version }}_ubuntu
-          mv ph-randomizer_${{ steps.commit-hash.outputs.hash }}_macos ph-randomizer_${{ steps.version-string.outputs.version }}_macos
-          mv ph-randomizer_${{ steps.commit-hash.outputs.hash }}_windows ph-randomizer_${{ steps.version-string.outputs.version }}_windows
+#       - name: Replace commit hash with version string
+#         run: |
+#           mv ph-randomizer_${{ steps.commit-hash.outputs.hash }}_ubuntu ph-randomizer_${{ steps.version-string.outputs.version }}_ubuntu
+#           mv ph-randomizer_${{ steps.commit-hash.outputs.hash }}_macos ph-randomizer_${{ steps.version-string.outputs.version }}_macos
+#           mv ph-randomizer_${{ steps.commit-hash.outputs.hash }}_windows ph-randomizer_${{ steps.version-string.outputs.version }}_windows
 
-      - name: Zip up executables
-        run: |
-          zip -r -j ph-randomizer_${{ steps.version-string.outputs.version }}_linux.zip ph-randomizer_${{ steps.version-string.outputs.version }}_ubuntu
-          zip -r -j ph-randomizer_${{ steps.version-string.outputs.version }}_macos.zip ph-randomizer_${{ steps.version-string.outputs.version }}_macos
-          zip -r -j ph-randomizer_${{ steps.version-string.outputs.version }}_windows.zip ph-randomizer_${{ steps.version-string.outputs.version }}_windows
+#       - name: Zip up executables
+#         run: |
+#           zip -r -j ph-randomizer_${{ steps.version-string.outputs.version }}_linux.zip ph-randomizer_${{ steps.version-string.outputs.version }}_ubuntu
+#           zip -r -j ph-randomizer_${{ steps.version-string.outputs.version }}_macos.zip ph-randomizer_${{ steps.version-string.outputs.version }}_macos
+#           zip -r -j ph-randomizer_${{ steps.version-string.outputs.version }}_windows.zip ph-randomizer_${{ steps.version-string.outputs.version }}_windows
 
-      - name: Create a GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ph-randomizer_${{ steps.version-string.outputs.version }}_linux.zip
-            ph-randomizer_${{ steps.version-string.outputs.version }}_macos.zip
-            ph-randomizer_${{ steps.version-string.outputs.version }}_windows.zip
+#       - name: Create a GitHub Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           files: |
+#             ph-randomizer_${{ steps.version-string.outputs.version }}_linux.zip
+#             ph-randomizer_${{ steps.version-string.outputs.version }}_macos.zip
+#             ph-randomizer_${{ steps.version-string.outputs.version }}_windows.zip

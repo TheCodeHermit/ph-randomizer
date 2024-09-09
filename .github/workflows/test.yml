@@ -1,0 +1,121 @@
+name: testing melonDS
+on:
+  pull_request:
+jobs:
+  # generate-base-patch-test-jobs:
+  #   name: Generate base patch test jobs
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     should-run-tests: ${{ steps.filter.outputs.base-patches }}
+  #     job-matrix: ${{ steps.set-test-matrix.outputs.matrix }}
+  #   steps:
+  #   - uses: actions/checkout@v4
+
+  #   - name: Check if base patch tests should be run
+  #     uses: dorny/paths-filter@v2
+  #     id: filter
+  #     with:
+  #       filters: |
+  #         base-patches:
+  #           - 'base/**'
+  #           - 'tests/desmume/**'
+  #           - '.github/workflows/**'
+  #           - '.python-version'
+  #           - 'setup.cfg'
+
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version-file: '.python-version'
+
+  #   - name: Upgrade `pip` and install `wheel`
+  #     run: python -m pip install --upgrade pip wheel
+
+  #   - name: Install dependencies
+  #     run: |
+  #       pip install -e .[test,desmume]
+
+  #   - name: Get list of tests to run in separate jobs
+  #     id: set-test-matrix
+  #     run: |
+  #       python .github/generate_desmume_test_jobs.py
+  #       echo "matrix=$(cat .github/matrix.json)" >> $GITHUB_OUTPUT
+
+  test-desmume:
+    name: Run base patch tests [${{ matrix.module }}] (${{ matrix.rom_variant }})
+    # needs:
+    #   - generate-base-patch-test-jobs
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rom_variant: US
+            google_drive_url_secret: PH_US_GOOGLE_DRIVE_ID
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Also retrieve previous commit so we can check if there are relevant changes
+          fetch-depth: 2
+
+      - name: Download BizHawk
+        run: |
+          curl -L https://github.com/TASEmulators/BizHawk/releases/download/2.9.1/BizHawk-2.9.1-win-x64.zip -o BizHawk-2.9.1-win-x64.zip
+          unzip BizHawk-2.9.1-win-x64.zip -d BizHawk
+
+      - name: Download BizHawk external tool
+        run: |
+          curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -L -o ExternalTool.zip "https://api.github.com/repos/mike8699/birds-eye/actions/artifacts/1906957269/zip" 
+          unzip ExternalTool.zip -d BizHawk/ExternalTools
+
+      - run: |
+          powershell -Command "Invoke-WebRequest https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe -OutFile vcredist_x64.exe"
+          powershell -Command "Start-Process -FilePath vcredist_x64.exe -ArgumentList '/install /q /norestart' -Verb RunAs -Wait"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: '.python-version'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install uv
+          uv venv
+          uv pip install -e .[test,desmume]
+          uv pip install gdown
+
+      - name: Activate virtualenv
+        run: |
+          . .venv/Scripts/activate
+          echo PATH=$PATH >> $GITHUB_ENV
+
+      - name: Fetch PH rom
+        run: gdown ${{ secrets[matrix.google_drive_url_secret] }}
+
+      - name: Get filename of rom
+        id: rom-filename
+        run: echo "filename=$(ls *.nds)" >> $GITHUB_OUTPUT
+
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - name: Run tests
+        run: PY_DESMUME_BATTERY_DIR="$pythonLocation" pytest tests/desmume/ -k test_custom_chest_items[MelonDSWrapper-0x2- -s -o log_file_level=debug -o log_cli=true
+        env:
+          PH_ROM_PATH: ${{ steps.rom-filename.outputs.filename }}
+          PY_DESMUME_VIDEO_RECORDING_DIR: recordings/
+          EMUHAWK_PATH: BizHawk/EmuHawk.exe
+
+      - name: Save recordings of failed tests as artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test_recordings_${{ matrix.module }}_${{ matrix.rom_variant }}
+          path: recordings/
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf *.nds
