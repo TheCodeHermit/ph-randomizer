@@ -7,12 +7,12 @@ dependencies = [
     "PySide6==6.6.1",
     "click==8.1.3",
     "inflection==0.5.1",
-    "ndspy==4.1.0",
+    "ndspy@git+https://github.com/RoadrunnerWMC/ndspy.git@26688c68a180b169d42097edd41b061d788ba904",
     "ordered-set==4.1.0",
     "pydantic==2.4.2",
     "pyparsing==3.1.1",
     "vidua==0.4.5",
-    "zed@git+https://github.com/phst-randomizer/zed.git@5ee969236bf3c3d0707da963e5edc818ddf246d3",
+    "zed@git+https://github.com/phst-randomizer/zed.git@b3ac46ef74fe8919b844bff96cc31ce4f40e5eed",
 ]
 
 [project.optional-dependencies]
