@@ -89,18 +89,17 @@ print(seed_entry)
 inventory = []
 damage = ["progressiveSword","Hammer","GrappleingHook","Bow","Bombs","Bomchus"]
 #always accessible from beginning
-inventory.append(entries[45])
-inventory.append(entries[46])
-inventory.append(entries[63])
-inventory.append(entries[79])
-inventory.append(entries[82])
-#is this accessible without salvage arm? inventory.append(entries[83])
-inventory.append(entries[86])
-inventory.append(entries[89])
-inventory.append(entries[91])
-inventory.append(entries[242])
-inventory.append(entries[243])
-inventory.append(entries[257])
+inventory.append(entries[45])    #WoodenShield
+inventory.append(entries[46])    #QuiverUpgrade
+inventory.append(entries[63])    #Chest at the summit
+inventory.append(entries[79])    #Chest  after jumping with the cucco
+inventory.append(entries[83])    #Roll into the highest tree
+inventory.append(entries[86])    #Remove rocks from Lapelli's yard
+inventory.append(entries[89])    #PowerGem
+inventory.append(entries[91])    #Count the trees
+inventory.append(entries[242])   #Linebeck's chest
+inventory.append(entries[243])   #Sea chart chest
+inventory.append(entries[257])   #Get the Phantom Hourglass
 
 i = 1
 while i > 0:
