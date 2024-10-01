@@ -87,7 +87,7 @@ print("\nCurrent seed entry:")
 print(seed_entry)
 
 inventory = []
-damage = ["progressiveSword","Hammer","GrappleHook","Bow","Bombs","Bomchus"]
+damage = ["progressiveSword","Hammer","GrappleingHook","Bow","Bombs","Bomchus"]
 #always accessible from beginning
 inventory.append(entries[45])
 inventory.append(entries[46])
