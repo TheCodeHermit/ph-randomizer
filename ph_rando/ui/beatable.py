@@ -43,11 +43,11 @@ Aquanine = False
 Crimsonine = False
 Azurine = False
 
-HeroNewClothes = Fase
+HeroNewClothes = False
 JolenesLetter = False
 Kaleidoscope = False
 WoodHeart = False
-GuardNotebook
+GuardNotebook = False
 
 
 def extract_bottom_level_entries(file_path):
