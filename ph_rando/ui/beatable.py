@@ -79,7 +79,7 @@ def extract_bottom_level_entries(file_path):
     return bottom_level_entries, current_seed_entry
 
 # Example usage
-file_path = r"C:\Users\James.Broadhead\3D Objects\spoilerlog.json"
+file_path = "/home/ubuntu/test1/spoilerlog.json"
 
 entries, seed_entry = extract_bottom_level_entries(file_path)
 
