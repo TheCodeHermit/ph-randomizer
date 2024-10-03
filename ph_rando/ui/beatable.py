@@ -5,7 +5,15 @@
 
 import json
 import sys
+from pathlib import Path
 from . import fakecli
+
+@click.option(
+    '--spoiler-log',
+    required=False,
+    type=click.Path(exists=False, path_type=Path),
+    help='File path to save spoiler log to.',
+)
 
 #inventory
 NWSeaChart = False
@@ -90,7 +98,11 @@ def gemDeDupe(GemArg):
         else:
             var_1 += 1
 
-file_path = /home/ubuntu/test1/spoiler.json
+file_path = None
+
+if '--spoiler-log' in sys.argv:
+    spoiler_log_index = sys.argv.index('--spoiler-log')
+    file_path = Path(sys.argv[spoiler_log_index + 1])
 
 entries, seed_entry = extract_bottom_level_entries(file_path)
 
