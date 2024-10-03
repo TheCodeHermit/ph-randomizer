@@ -8,12 +8,6 @@ import sys
 from pathlib import Path
 from . import fakecli
 
-@click.option(
-    '--spoiler-log',
-    required=False,
-    type=click.Path(exists=False, path_type=Path),
-    help='File path to save spoiler log to.',
-)
 
 #inventory
 #NWSeaChart = False
@@ -195,7 +189,7 @@ inventory.append(entries[257])   #Get the Phantom Hourglass
     
 
 
-if NWSeaChart in inventory:
+if "NWSeaChart" in inventory:
     for entry in inventory:
         print(entry)
     print("Completable")
