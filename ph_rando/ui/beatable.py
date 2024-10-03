@@ -5,6 +5,7 @@
 
 import json
 import sys
+from . import fakecli
 
 #inventory
 NWSeaChart = False
@@ -89,7 +90,7 @@ def gemDeDupe(GemArg):
         else:
             var_1 += 1
 
-file_path = r"C:\Users\James.Broadhead\3D Objects\spoilerlog.json"
+file_path = /home/ubuntu/test1/spoiler.json
 
 entries, seed_entry = extract_bottom_level_entries(file_path)
 
@@ -191,7 +192,7 @@ if NWSeaChart in inventory:
 for entry in inventory:
     print(entry)
 print("Womp womp "+ seed_entry)
-
+fakecli.randomizer_cli()
 
     
 
