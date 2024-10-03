@@ -16,7 +16,7 @@ from . import fakecli
 )
 
 #inventory
-NWSeaChart = False
+#NWSeaChart = False
 SESeaChart = False
 NESeaChart = False
 
