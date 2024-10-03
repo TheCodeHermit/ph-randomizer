@@ -1,7 +1,7 @@
-#are upgrades progressive?
 #why is round crystal avaliable as salvage??? that doesnt work right? and force gems?
 #do you need the sw seachart, that is the question
 #can you go around the back way if you have the nw sea chart
+#do you really need the phantom sword to fight bellum?
 
 import json
 import sys
@@ -47,7 +47,7 @@ HeroNewClothes = False
 JolenesLetter = False
 Kaleidoscope = False
 WoodHeart = False
-GuardNotebook = False
+GuardNotebook =False
 
 
 def extract_bottom_level_entries(file_path):
@@ -78,16 +78,33 @@ def extract_bottom_level_entries(file_path):
 
     return bottom_level_entries, current_seed_entry
 
-# Example usage
-file_path = "/home/ubuntu/test1/spoilerlog.json"
+def gemDeDupe(GemArg):
+    var_1 = 0
+    GemNum = 1
+    for index in entries:
+        if entries[var_1] == GemArg:
+            entries[var_1] = GemArg + str(GemNum)
+            GemNum+=1
+            var_1+=1
+        else:
+            var_1 += 1
+
+file_path = r"C:\Users\James.Broadhead\3D Objects\spoilerlog.json"
 
 entries, seed_entry = extract_bottom_level_entries(file_path)
 
-print("\nCurrent seed entry:")
-print(seed_entry)
+#renaming duplicates
+gemDeDupe("PowerGem")
+gemDeDupe("WisdomGem")
+gemDeDupe("CourageGem")
+
+
 
 inventory = []
-damage = ["progressiveSword","Hammer","GrappleingHook","Bow","Bombs","Bomchus"]
+powerGems =[]
+wisdomGems = []
+courageGems = []
+damage = ["progressiveSword","Hammer","GrappleHook","Bow","Bombs","Bomchus"]
 #always accessible from beginning
 inventory.append(entries[45])    #WoodenShield
 inventory.append(entries[46])    #QuiverUpgrade
@@ -101,16 +118,79 @@ inventory.append(entries[242])   #Linebeck's chest
 inventory.append(entries[243])   #Sea chart chest
 inventory.append(entries[257])   #Get the Phantom Hourglass
 
-i = 1
-while i > 0:
-    if bool(set(damage) & set(inventory)): 
-        #can you kill fire bats without boomerang? inventory.append(entries[168])
-        print("damage")
-        sys.exit("Found Damage")
-    i -=1
-else:
+'''def chest_emulator():
+    #if "ProgressiveSword" in inventory:
+        
+    if "Shovel" in inventory:
+        inventory.append(entries[64]) #Dig the grass near the Temple Entrance
+        inventory.append(entries[67]) #Dig the mark (In astrids basement)
+
+    if "GrapplingHook" in inventory:
+        inventory.append(entries[62]) #Chest on the small northern island (Ember Isle)
+
+    if "Cannon" in inventory: #need to find out if can go the back way through the nw sea chart
+        #and then for return to molida when to kill the monster thingy
+        #after salvage arm or after sun crest collection, or after sun crest salvage??
+        inventory.append(entries[58]) #Chest on main island (Spirit)
+
+
+
+        inventory = list(set(inventory))
+        if sum(1 for item in inventory if 'PowerGem' in item) > 9:
+            inventory.append(entries[52]) #Gather 10 Power Gems
+            if sum(1 for item in inventory if 'PowerGem' in item) > 19:
+                inventory.append(entries[53]) #Gather 20 Power Gems
+        if sum(1 for item in inventory if 'WisdomGem' in item) > 9:
+            inventory.append(entries[54]) #Gather 10 Wisdom Gems
+            if sum(1 for item in inventory if 'WisdomGem' in item) > 19:
+                inventory.append(entries[55]) #Gather 20 Wisdom Gems
+        if sum(1 for item in inventory if 'CourageGem' in item) > 9:
+            inventory.append(entries[56]) #Gather 10 Courage Gems
+            if sum(1 for item in inventory if 'CourageGem' in item) > 19:
+                inventory.append(entries[57]) #Gather 20 Courage Gems
+
+
+
+    if "NWSeaChart" in inventory:
+            
+            if "Shovel" in inventory:
+                
+            if "GrapplingHook" in inventory:
+
+            if "Cannon" in inventory:
+
+    if "SESeaChart" in inventory:
+            
+            if "Shovel" in inventory:
+                
+            if "GrapplingHook" in inventory:
+
+            if "Cannon" in inventory:
+
+                if "NESeaChart" in inventory:
+
+                    if "Shovel" in inventory:
+                
+                    if "GrapplingHook" in inventory:
+
+                    if "Cannon" in inventory:
+
+
+'''
+    #if bool(set(damage) & set(inventory)): 
+        
+    
+
+
+if NWSeaChart in inventory:
     for entry in inventory:
         print(entry)
+    print("Completable")
+    sys.exit(seed_entry)
+
+for entry in inventory:
+    print(entry)
+print("Womp womp "+ seed_entry)
 
 
     
